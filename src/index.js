@@ -2,23 +2,37 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-// Target for the button: 'extensions_buttons_template_zone' is a common area for extension buttons.
-// This should place the button in a toolbar or a dedicated extension button area in the main UI.
-const rootContainer = document.getElementById('extensions_buttons_template_zone');
+function initializeReactApp() {
+    // This ID is commonly used in SillyTavern for placing extension buttons
+    // in a dedicated bar or dropdown accessible from the main UI.
+    const rootContainer = document.getElementById('extensions_buttons_template_zone');
 
-if (rootContainer) {
-    const rootElement = document.createElement('div');
-    // The button itself will be styled by App.js or SillyTavern's CSS for 'menu_button'
-    // Add inline style to ensure the div itself doesn't break flex layouts if 'extensions_buttons_template_zone' is a flex container.
-    rootElement.style.display = 'inline-block'; // Or 'flex', 'contents' depending on parent styling
-    rootContainer.appendChild(rootElement);
+    if (rootContainer) {
+        const rootElement = document.createElement('div');
+        // Style the container div to be inline so it fits into a button bar.
+        // The actual button styling is handled by the 'menu_button' class in App.js.
+        rootElement.style.display = 'inline-block'; 
+        rootContainer.appendChild(rootElement);
 
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(
-        <React.StrictMode>
-            <App />
-        </React.StrictMode>
-    );
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(
+            <React.StrictMode>
+                <App />
+            </React.StrictMode>
+        );
+        console.log("Kaplay Game Extension: Button host successfully rendered in 'extensions_buttons_template_zone'.");
+    } else {
+        console.error("SillyTavern Extension: Target container 'extensions_buttons_template_zone' not found. Game button will not be loaded.");
+        // You could add fallback logic here, e.g., trying a different container ID
+        // or logging more detailed diagnostics if this critical element is missing.
+    }
+}
+
+// Ensure the DOM is fully loaded before trying to initialize the React app.
+// This helps prevent errors if the script runs before the target DOM elements are ready.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeReactApp);
 } else {
-    console.error("SillyTavern Extension: Target container 'extensions_buttons_template_zone' not found. Game button will not be loaded.");
+    // DOMContentLoaded has already fired
+    initializeReactApp();
 }
