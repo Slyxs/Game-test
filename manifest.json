@@ -1,12 +1,11 @@
 {
-    "display_name": "Template Extension",
-    "loading_order": 1,
-    "requires": [],
-    "optional": [],
-    "js": "dist/index.js",
-    "css": "",
-    "author": "Cohee1207",
-    "version": "1.0.0",
-    "homePage": "https://github.com/Cohee1207/Extension-ReactTemplate",
-    "auto_update": true
+  "manifest_version": 2,
+  "name": "Kaplay Game Test",
+  "version": "0.1.1",
+  "description": "A Kaplay game test extension for SillyTavern. Renders a button in the menu and the game in chat.",
+  "author": "YourName",
+  "entry_point": "dist/index.js",
+  "type": "SillyTavern.Extension",
+  "tags": ["game", "kaplay", "test", "react"],
+  "display_name": "Play Kaplay Game"
 }
