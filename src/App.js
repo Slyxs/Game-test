@@ -1,111 +1,126 @@
-/* global SillyTavern */
 import React, { useState, useEffect, useRef } from 'react';
 import kaplay from 'kaplay';
 
 function App() {
-    const [showGame, setShowGame] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
     const gameContainerRef = useRef(null);
     const kaplayInstanceRef = useRef(null);
 
     useEffect(() => {
-        if (showGame && gameContainerRef.current) {
-            // Prevent multiple initializations if effect runs multiple times rapidly
-            if (kaplayInstanceRef.current) {
-                return;
-            }
-
+        if (gameStarted && gameContainerRef.current && !kaplayInstanceRef.current) {
+            // Initialize Kaplay
             const k = kaplay({
-                global: false, // Recommended to avoid polluting the global namespace
-                root: gameContainerRef.current,
+                root: gameContainerRef.current, // Mount Kaplay canvas in this div
                 width: 640,
                 height: 480,
-                background: [0, 0, 0], // Black background for the game
+                // Kaplay will create and append its own canvas to the root
+                // To use a specific canvas:
+                // canvas: myCanvasElement
             });
 
             kaplayInstanceRef.current = k;
 
-            // Define a simple game scene
+            // --- Kaplay game code starts here ---
             k.scene("main", () => {
+                // Add a text label
                 k.add([
-                    k.text("Kaplay Game Running!", { size: 24 }),
-                    k.pos(k.width() / 2, k.height() / 2),
+                    k.text("Kaplay Game!"),
+                    k.pos(k.width() / 2, 40),
                     k.anchor("center"),
-                    k.color(255, 255, 255), // White text
                 ]);
 
-                // Add a simple rectangle
+                // Add a player character (a simple rectangle)
+                const player = k.add([
+                    k.rect(40, 40),
+                    k.pos(100, k.height() - 100),
+                    k.color(0, 0, 255), // Blue color
+                    k.anchor("botleft"),
+                    k.body(), // Makes it a physical body (for gravity, etc.)
+                    k.area(), // Gives it a collider
+                    "player", // Tag for easy access
+                ]);
+
+                // Add a ground
                 k.add([
-                    k.rect(50, 50),
-                    k.pos(50, 50),
-                    k.color(255, 0, 0), // Red color
-                    k.anchor("center"),
+                    k.rect(k.width(), 20),
+                    k.pos(0, k.height() - 20),
+                    k.color(0, 255, 0), // Green color
+                    k.anchor("botleft"),
+                    k.area(), // Required for collisions
+                    k.body({ isStatic: true }), // Makes it a static body
+                ]);
+
+                // Player movement parameters
+                const JUMP_FORCE = 720;
+                const SPEED = 320;
+
+                // Handle player input
+                k.onKeyDown("left", () => {
+                    player.move(-SPEED, 0);
+                });
+
+                k.onKeyDown("right", () => {
+                    player.move(SPEED, 0);
+                });
+
+                k.onKeyPress("space", () => {
+                    if (player.isGrounded()) {
+                        player.jump(JUMP_FORCE);
+                    }
+                });
+
+                // Display controls help text
+                k.add([
+                    k.text("Controls: Left/Right Arrows, Space to Jump", { size: 18 }),
+                    k.pos(10, k.height() - 10),
+                    k.anchor("botleft"),
                 ]);
             });
 
-            // Start the main scene
+            // Start the "main" scene
             k.go("main");
-
-            // Cleanup function for when the component unmounts or showGame becomes false
-            return () => {
-                if (kaplayInstanceRef.current) {
-                    kaplayInstanceRef.current.destroy();
-                    kaplayInstanceRef.current = null;
-                }
-                // Ensure the container is empty after destroying Kaplay
-                if (gameContainerRef.current) {
-                    gameContainerRef.current.innerHTML = '';
-                }
-            };
-        } else {
-            // This block ensures cleanup if showGame becomes false and effect re-runs
-            // The return function from the effect primarily handles this, but this is an extra guard.
-            if (kaplayInstanceRef.current) {
-                kaplayInstanceRef.current.destroy();
-                kaplayInstanceRef.current = null;
-                if (gameContainerRef.current) {
-                    gameContainerRef.current.innerHTML = '';
-                }
-            }
+            // --- Kaplay game code ends here ---
         }
-    }, [showGame]); // Re-run the effect when showGame changes
 
-    const handlePlayGameClick = () => {
-        setShowGame(true);
+        // Cleanup function: This runs when gameStarted changes or component unmounts
+        return () => {
+            if (kaplayInstanceRef.current) {
+                if (typeof kaplayInstanceRef.current.quit === 'function') {
+                    kaplayInstanceRef.current.quit();
+                }
+                kaplayInstanceRef.current = null;
+            }
+            // Ensure the container is empty after Kaplay quits
+            if (gameContainerRef.current) {
+                gameContainerRef.current.innerHTML = '';
+            }
+        };
+    }, [gameStarted]); // Re-run effect if gameStarted changes
+
+    const handleToggleGame = () => {
+        setGameStarted(prevGameStarted => !prevGameStarted);
     };
-
-    const handleStopGameClick = () => {
-        setShowGame(false); // This will trigger the cleanup in useEffect
-    };
-
-    function handleClick() {
-        alert(`Hello, ${SillyTavern.getContext().name1}!`);
-    }
 
     return (
         <div>
-            {!showGame ? (
-                <button onClick={handlePlayGameClick} className="menu_button">
-                    Launch Kaplay Game
-                </button>
-            ) : (
-                <button onClick={handleStopGameClick} className="menu_button">
-                    Stop Kaplay Game
-                </button>
-            )}
-            {showGame && (
-                <div 
-                    ref={gameContainerRef} 
-                    id="kaplay-game-container" 
-                    style={{ 
-                        width: '640px', 
-                        height: '480px', 
-                        border: '1px solid #ccc', 
-                        marginTop: '10px' 
-                    }}
-                >
-                    {/* Kaplay canvas will be injected here */}
-                </div>
-            )}
+            <button onClick={handleToggleGame} className="menu_button">
+                {gameStarted ? 'Stop Kaplay Game' : 'Start Kaplay Game'}
+            </button>
+            {/* The div for Kaplay game. Its display is controlled by CSS. */}
+            <div
+                ref={gameContainerRef}
+                id="kaplay-game-container"
+                style={{
+                    display: gameStarted ? 'block' : 'none', // Show/hide the container
+                    width: '640px',
+                    height: '480px',
+                    border: gameStarted ? '1px solid black' : 'none', // Optional: border only when active
+                    marginTop: '10px',
+                    backgroundColor: gameStarted ? '#f0f0f0' : 'transparent', // Optional: background
+                }}
+            >
+                {/* Kaplay will attach its canvas here when gameStarted is true and useEffect runs */}
+            </div>
         </div>
     );
 }
