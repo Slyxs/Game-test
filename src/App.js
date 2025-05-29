@@ -115,9 +115,10 @@ function App() {
 
     return (
         <>
-            <button onClick={handleToggleGame} className="menu_button">
+            {/* Changed from <button> to <div> to match reference */}
+            <div onClick={handleToggleGame} className="menu_button" style={{ cursor: 'pointer' }}>
                 {gameStarted ? 'Stop Kaplay Game' : 'Start Kaplay Game'}
-            </button>
+            </div>
             {/* Game UI is now managed by useEffect and appended to chat */}
         </>
     );

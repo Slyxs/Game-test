@@ -8,12 +8,18 @@ function initializeReactApp() {
     const rootContainer = document.getElementById('extensions_buttons_template_zone');
 
     if (rootContainer) {
-        console.log("Kaplay Game Extension: Found 'extensions_buttons_template_zone'. Attempting to render button host."); // Added log
-        const rootElement = document.createElement('div');
-        // Style the container div to be inline so it fits into a button bar.
-        // The actual button styling is handled by the 'menu_button' class in App.js.
-        rootElement.style.display = 'inline-block'; 
+        console.log("Kaplay Game Extension: Found 'extensions_buttons_template_zone'. Attempting to render button host."); 
+        
+        // Use a span as the root for the React app. Spans are inline by default.
+        // We'll still style it as inline-block to ensure it behaves correctly in a button bar.
+        const rootElement = document.createElement('span');
+        rootElement.id = 'kaplay-game-button-host'; // Added ID for easier DOM inspection
+        rootElement.style.display = 'inline-block'; // Ensure it takes space in the layout
+        rootElement.style.margin = '0'; // Prevent default margins from interfering
+        rootElement.style.padding = '0'; // Prevent default paddings from interfering
+        
         rootContainer.appendChild(rootElement);
+        console.log("Kaplay Game Extension: Host element <span id='kaplay-game-button-host'> appended to 'extensions_buttons_template_zone'.");
 
         const root = ReactDOM.createRoot(rootElement);
         root.render(
@@ -21,9 +27,9 @@ function initializeReactApp() {
                 <App />
             </React.StrictMode>
         );
-        console.log("Kaplay Game Extension: Button host successfully rendered into 'extensions_buttons_template_zone'. Check if button is visible and correctly styled by 'menu_button' class."); // Enhanced log
+        console.log("Kaplay Game Extension: React <App /> component (which includes the button) rendered into host span. Please check browser console and DOM inspector.");
     } else {
-        console.error("SillyTavern Extension: Target container 'extensions_buttons_template_zone' not found. Game button will not be loaded.");
+        console.error("SillyTavern Extension: Target container 'extensions_buttons_template_zone' not found. Game button will not be loaded. Ensure this element exists in your SillyTavern HTML.");
         // You could add fallback logic here, e.g., trying a different container ID
         // or logging more detailed diagnostics if this critical element is missing.
     }
@@ -35,5 +41,6 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeReactApp);
 } else {
     // DOMContentLoaded has already fired
+    console.log("Kaplay Game Extension: DOMContentLoaded already fired. Initializing React app immediately."); // Added log for this path
     initializeReactApp();
 }
