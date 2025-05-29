@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
   "name": "Kaplay Game Test",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Kaplay game test extension for SillyTavern. Renders a button in the menu and the game in chat.",
   "author": "YourName",
   "entry_point": "dist/index.js",
   "type": "SillyTavern.Extension",
   "tags": ["game", "kaplay", "test", "react"],
-  "display_name": "Play Kaplay Game"
+  "display_name": "Launch Kaplay Game Test"
 }
