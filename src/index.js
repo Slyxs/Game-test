@@ -8,6 +8,7 @@ function initializeReactApp() {
     const rootContainer = document.getElementById('extensions_buttons_template_zone');
 
     if (rootContainer) {
+        console.log("Kaplay Game Extension: Found 'extensions_buttons_template_zone'. Attempting to render button host."); // Added log
         const rootElement = document.createElement('div');
         // Style the container div to be inline so it fits into a button bar.
         // The actual button styling is handled by the 'menu_button' class in App.js.
@@ -20,7 +21,7 @@ function initializeReactApp() {
                 <App />
             </React.StrictMode>
         );
-        console.log("Kaplay Game Extension: Button host successfully rendered in 'extensions_buttons_template_zone'.");
+        console.log("Kaplay Game Extension: Button host successfully rendered into 'extensions_buttons_template_zone'. Check if button is visible and correctly styled by 'menu_button' class."); // Enhanced log
     } else {
         console.error("SillyTavern Extension: Target container 'extensions_buttons_template_zone' not found. Game button will not be loaded.");
         // You could add fallback logic here, e.g., trying a different container ID
